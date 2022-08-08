@@ -62,12 +62,10 @@ class ChromeBookmarks(Extension):
             for child in data['children']:
                 self.find_rec(child, query, matches)
         else:
-            res = data['name'].lower().find(query, 0, len(data['name']))
+            res = data['name'].lower().find(query.lower())
             if res != -1:
                 matches.append(data)
                 self.matches_len += 1
-
-        return matches
 
     def get_items(self, query):
 
@@ -78,13 +76,13 @@ class ChromeBookmarks(Extension):
             query = ''
 
         for bookmarks_path, browser in self.bookmarks_paths:
+
             matches = []
+
             with open(bookmarks_path) as data_file:
                 data = json.load(data_file)
-                bookmark_bar = data['roots']['bookmark_bar']
-                other = data['roots']['other']
-                self.find_rec(other, query, matches)
-                matches = self.find_rec(bookmark_bar, query, matches)
+                self.find_rec(data['roots']['bookmark_bar'], query, matches)
+                self.find_rec(data['roots']['other'], query, matches)
 
             for bookmark in matches:
                 bookmark_name = bookmark['name'].encode('utf-8')
